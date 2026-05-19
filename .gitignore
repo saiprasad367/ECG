@@ -1,0 +1,55 @@
+# System / IDEs
+.agents/
+.cursor/
+.jetro/
+.mcp.json
+.windsurfrules
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+*.suo
+*.sln
+*.swp
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+.ipynb_checkpoints/
+backend/venv/
+backend/.env
+backend/generated/
+backend/models/
+backend/storage/
+backend/datasets/
+backend/app/database/PTB diagnostic ecg database csv files/
+backend/app/database/mit-bih-arrhythmia-database-1.0.0/
+backend/app/database/ptbdb/
+
+# Node / Frontend
+pulse-analytics/node_modules/
+pulse-analytics/dist/
+pulse-analytics/.wrangler/
+pulse-analytics/.tanstack/
+pulse-analytics/dist-ssr/
+pulse-analytics/.output/
+pulse-analytics/.vinxi/
+pulse-analytics/.nitro/
+
+# Local databases and large datasets
+*.db
+*.sqlite
+data/
+projects/
+*.log
+*.hex
+*.rpt
+*.zip
+*.webp
+*.png
+*.jpg
+*.jpeg
+*.gif

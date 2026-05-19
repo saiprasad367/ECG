@@ -1,0 +1,27 @@
+# Virtual Environments
+venv/
+.venv/
+env/
+
+# Datasets & Heavy Assets
+datasets/
+data/
+generated/
+
+# Python Cache
+**/__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Git and OS metadata
+.git/
+.gitignore
+.dockerignore
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
