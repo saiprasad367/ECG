@@ -33,7 +33,7 @@ class Settings(BaseSettings):
     SESSION_TTL_HOURS: int = 24
 
     # CORS
-    CORS_ORIGINS: str = "http://localhost:3000,http://localhost:5173,http://127.0.0.1:5173"
+    CORS_ORIGINS: str = "http://localhost:3000,http://localhost:5173,http://127.0.0.1:5173,https://ecg-pearl.vercel.app,*"
 
     # Model paths
     MODEL_PATH: str = "models/best_model.pth"

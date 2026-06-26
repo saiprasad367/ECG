@@ -25,14 +25,24 @@ def create_app() -> FastAPI:
         description="ECG analysis and FPGA validation platform",
     )
 
-    # Middleware
-    app.add_middleware(
-        CORSMiddleware,
-        allow_origins=settings.cors_origins_list,
-        allow_credentials=True,
-        allow_methods=["*"],
-        allow_headers=["*"],
-    )
+    # Middleware — support wildcard "*" when CORS_ORIGINS contains it
+    cors_origins = settings.cors_origins_list
+    if "*" in cors_origins:
+        app.add_middleware(
+            CORSMiddleware,
+            allow_origins=["*"],
+            allow_credentials=False,  # cannot use credentials with wildcard
+            allow_methods=["*"],
+            allow_headers=["*"],
+        )
+    else:
+        app.add_middleware(
+            CORSMiddleware,
+            allow_origins=cors_origins,
+            allow_credentials=True,
+            allow_methods=["*"],
+            allow_headers=["*"],
+        )
 
     # Rate limiting
     app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
@@ -69,6 +79,10 @@ def create_app() -> FastAPI:
         logger.info("🛑 Shutting down CardioFPGA Backend...")
         await close_db()
         await close_redis()
+
+    @app.get("/", tags=["System"])
+    async def root():
+        return {"status": "CardioFPGA Backend is running", "version": "1.0.0"}
 
     @app.get("/health", tags=["System"])
     async def health_check():
