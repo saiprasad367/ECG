@@ -71,15 +71,18 @@ const fade = {
   transition: { duration: 0.35 },
 };
 
+interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
+  children: React.ReactNode;
+  className?: string;
+  glow?: "blue" | "green" | "purple" | "orange" | "red";
+}
+
 function Card({
   children,
   className,
   glow,
-}: {
-  children: React.ReactNode;
-  className?: string;
-  glow?: "blue" | "green" | "purple" | "orange" | "red";
-}) {
+  ...props
+}: CardProps) {
   const glowMap: Record<string, string> = {
     blue: "shadow-glow-blue",
     green: "shadow-glow-green",
@@ -91,6 +94,7 @@ function Card({
         glow && glowMap[glow],
         className,
       )}
+      {...props}
     >
       {children}
     </div>
