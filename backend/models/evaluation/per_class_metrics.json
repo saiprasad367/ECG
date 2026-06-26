@@ -1,0 +1,37 @@
+{
+  "Normal": {
+    "precision": 0.9956,
+    "recall": 0.9636,
+    "f1_score": 0.9793,
+    "specificity": 0.9793,
+    "support": 18121
+  },
+  "Ventricular": {
+    "precision": 0.6043,
+    "recall": 0.9011,
+    "f1_score": 0.7235,
+    "specificity": 0.9846,
+    "support": 556
+  },
+  "Supraventricular": {
+    "precision": 0.9262,
+    "recall": 0.9627,
+    "f1_score": 0.9441,
+    "specificity": 0.9946,
+    "support": 1447
+  },
+  "Fusion": {
+    "precision": 0.393,
+    "recall": 0.913,
+    "f1_score": 0.5495,
+    "specificity": 0.9896,
+    "support": 161
+  },
+  "Unknown": {
+    "precision": 0.9757,
+    "recall": 0.9988,
+    "f1_score": 0.9871,
+    "specificity": 0.998,
+    "support": 1608
+  }
+}

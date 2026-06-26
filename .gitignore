@@ -22,7 +22,7 @@ __pycache__/
 backend/venv/
 backend/.env
 backend/generated/
-backend/models/
+# backend/models/
 backend/storage/
 backend/datasets/
 backend/app/database/PTB diagnostic ecg database csv files/
@@ -38,6 +38,7 @@ pulse-analytics/dist-ssr/
 pulse-analytics/.output/
 pulse-analytics/.vinxi/
 pulse-analytics/.nitro/
+pulse-analytics/.vercel/
 
 # Local databases and large datasets
 *.db

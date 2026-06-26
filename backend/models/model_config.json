@@ -1,0 +1,18 @@
+{
+  "architecture": "1D-CNN",
+  "version": "v1.0.0",
+  "input_shape": [
+    1,
+    200
+  ],
+  "num_classes": 5,
+  "class_names": [
+    "Normal",
+    "Ventricular",
+    "Supraventricular",
+    "Fusion",
+    "Unknown"
+  ],
+  "overall_accuracy": 0.9642,
+  "weighted_f1_score": 0.9679
+}
