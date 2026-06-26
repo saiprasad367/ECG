@@ -25,24 +25,14 @@ def create_app() -> FastAPI:
         description="ECG analysis and FPGA validation platform",
     )
 
-    # Middleware — support wildcard "*" when CORS_ORIGINS contains it
-    cors_origins = settings.cors_origins_list
-    if "*" in cors_origins:
-        app.add_middleware(
-            CORSMiddleware,
-            allow_origins=["*"],
-            allow_credentials=False,  # cannot use credentials with wildcard
-            allow_methods=["*"],
-            allow_headers=["*"],
-        )
-    else:
-        app.add_middleware(
-            CORSMiddleware,
-            allow_origins=cors_origins,
-            allow_credentials=True,
-            allow_methods=["*"],
-            allow_headers=["*"],
-        )
+    # Middleware — open CORS for all origins (required for Vercel <-> Render cross-origin)
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=["*"],
+        allow_credentials=False,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
 
     # Rate limiting
     app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
