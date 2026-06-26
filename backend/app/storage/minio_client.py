@@ -47,7 +47,8 @@ def download_bytes(object_name: str) -> bytes:
 def get_presigned_url(object_name: str, expires_hours: int = 24) -> str:
     """Return a direct download route handled by our FastAPI backend proxy."""
     clean_obj_name = object_name.replace("s3://", "").replace(f"{settings.MINIO_BUCKET}/", "").replace("local://", "")
-    return f"http://127.0.0.1:8000/api/v1/download/direct?object_name={clean_obj_name}"
+    base_url = settings.PUBLIC_URL.rstrip("/")
+    return f"{base_url}/api/v1/download/direct?object_name={clean_obj_name}"
 
 
 

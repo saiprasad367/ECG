@@ -9,6 +9,7 @@ class Settings(BaseSettings):
     HOST: str = "0.0.0.0"
     PORT: int = 8000
     WORKERS: int = 1
+    PUBLIC_URL: str = "http://127.0.0.1:8000"
 
     # MongoDB
     MONGODB_URL: str = "mongodb://localhost:27017"
