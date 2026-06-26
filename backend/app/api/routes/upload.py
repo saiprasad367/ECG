@@ -45,6 +45,26 @@ async def upload_matlab(
     }
     await update_session_field(session_id, "matlab_upload", upload_doc)
 
+    # ── Critical: wipe stale downstream pipeline results ──────────────────────
+    # Any previous inference/quantization/hex results from an earlier dataset
+    # MUST be cleared so the UI doesn't show old data for the new upload.
+    await update_session_field(session_id, "inference", None)
+    await update_session_field(session_id, "quantization", None)
+    await update_session_field(session_id, "hex_generation", None)
+    await update_session_field(session_id, "fpga_analysis", None)
+    await update_session_field(session_id, "vivado_upload", None)
+    await update_session_field(session_id, "fpga_metrics", None)
+
+    # Invalidate Redis dashboard cache so the frontend gets fresh data immediately
+    try:
+        from app.database.redis_client import get_redis
+        redis = get_redis()
+        if redis:
+            await redis.delete(f"dashboard:{session_id}")
+            await redis.delete(f"inference_results:{session_id}")
+    except Exception:
+        pass  # Redis unavailable is fine — in-memory session is already clean
+
     return {
         "upload_id": upload_id,
         "session_id": session_id,

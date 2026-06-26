@@ -12,7 +12,7 @@ from app.storage.minio_client import ensure_bucket
 from app.ml.model_loader import load_model
 
 # Routers
-from app.api.routes import session, upload, inference, hex, fpga, analytics, websocket
+from app.api.routes import session, upload, inference, hex, fpga, analytics, websocket, model
 
 logging.basicConfig(level=logging.INFO if settings.DEBUG else logging.WARNING)
 logger = logging.getLogger(__name__)
@@ -48,6 +48,7 @@ def create_app() -> FastAPI:
     app.include_router(fpga.router, prefix=v1)
     app.include_router(analytics.router, prefix=v1)
     app.include_router(websocket.router)
+    app.include_router(model.router, prefix=v1)
 
     # Prometheus monitoring
     Instrumentator().instrument(app).expose(app, endpoint="/metrics")

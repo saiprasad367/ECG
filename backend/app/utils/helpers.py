@@ -26,7 +26,7 @@ def s3_path(session_id: str, subfolder: str, filename: str) -> str:
     return f"sessions/{session_id}/{subfolder}/{filename}"
 
 
-CLASS_NAMES = {0: "Normal", 1: "Ventricular", 2: "Supraventricular", 3: "Fusion", 4: "Unknown"}
+CLASS_NAMES = {0: "Normal", 1: "Supraventricular", 2: "Ventricular", 3: "Fusion", 4: "Unknown"}
 CLASS_IDS = {v: k for k, v in CLASS_NAMES.items()}
 ABNORMAL_CLASSES = {"Ventricular", "Supraventricular", "Fusion", "Unknown"}
 

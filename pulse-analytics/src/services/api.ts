@@ -157,6 +157,16 @@ class APIClient {
     return this.request('/upload/demo', { method: 'POST' });
   }
 
+  // Get real training metrics (accuracy, F1, history)
+  async getModelMetrics() {
+    return this.request('/model/metrics');
+  }
+
+  // Get model status (loaded, trained, paths)
+  async getModelStatus() {
+    return this.request('/model/status');
+  }
+
   // Reset the current analysis session
   async resetSession() {
     return this.request('/session/reset', { method: 'POST' });

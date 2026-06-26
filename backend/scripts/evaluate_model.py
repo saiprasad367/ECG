@@ -28,7 +28,7 @@ from scripts.dataset_loader import get_dataloaders
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-CLASS_NAMES = ["Normal", "Ventricular", "Supraventricular", "Fusion", "Unknown"]
+CLASS_NAMES = ["Normal", "Supraventricular", "Ventricular", "Fusion", "Unknown"]
 
 
 def evaluate(mitbih_dir: str, model_path: str = "models/best_model.pth", batch_size: int = 64):

@@ -64,9 +64,30 @@ def count_beats_from_segments(df: pd.DataFrame) -> int:
 
 
 def estimate_duration(df_ecg: pd.DataFrame, sampling_rate: int = 360) -> float:
+    """
+    Estimate ECG duration in seconds.
+    If 'time' column holds actual seconds (float, small increments like 0.0, 0.00278...)
+    we use max(time). If it holds sample indices (integers 0, 1, 2, 3...) we divide by
+    sampling_rate. Fallback: len(df) / sampling_rate.
+    """
     if "time" in df_ecg.columns:
         try:
-            return float(df_ecg["time"].max())
+            t = pd.to_numeric(df_ecg["time"], errors="coerce").dropna()
+            if len(t) == 0:
+                return len(df_ecg) / sampling_rate
+            t_max = float(t.max())
+            t_min = float(t.min())
+            t_range = t_max - t_min
+            # Heuristic: if max time > 5x the number of rows, it's sample indices
+            # (e.g. 17459 max for 17460 rows at 360Hz = indices, not seconds)
+            # Real-second time would be <= total_rows / sampling_rate
+            n_rows = len(df_ecg)
+            if t_max > n_rows / sampling_rate * 2:
+                # Sample indices — convert to seconds
+                return round(t_max / sampling_rate, 3)
+            else:
+                # Actual seconds
+                return round(t_max, 3)
         except Exception:
             pass
-    return len(df_ecg) / sampling_rate
+    return round(len(df_ecg) / sampling_rate, 3)

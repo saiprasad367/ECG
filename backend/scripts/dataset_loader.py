@@ -131,28 +131,68 @@ def load_ptb(ptb_dir: str):
     return X_list, y_list
 
 def get_dataloaders(mitbih_dir: str, ptb_dir: str, batch_size=64):
-    X_all, y_all = [], []
+    import pandas as pd
     
-    X_mit, y_mit = load_mitbih(mitbih_dir)
-    X_all.extend(X_mit)
-    y_all.extend(y_mit)
+    csv_paths = [
+        (os.path.join(mitbih_dir, "mitbih_train.csv"), os.path.join(mitbih_dir, "mitbih_test.csv")),
+        ("datasets/mit-bih/mitbih_train.csv", "datasets/mit-bih/mitbih_test.csv"),
+        (os.path.join(os.path.dirname(__file__), "..", "datasets", "mit-bih", "mitbih_train.csv"),
+         os.path.join(os.path.dirname(__file__), "..", "datasets", "mit-bih", "mitbih_test.csv"))
+    ]
     
-    if ptb_dir and os.path.exists(ptb_dir):
-        X_ptb, y_ptb = load_ptb(ptb_dir)
-        X_all.extend(X_ptb)
-        y_all.extend(y_ptb)
+    train_csv, test_csv = None, None
+    for tr, te in csv_paths:
+        if os.path.exists(tr) and os.path.exists(te):
+            train_csv, test_csv = tr, te
+            break
+            
+    if train_csv and test_csv:
+        logger.info(f"Loading preprocessed MIT-BIH CSV datasets: {train_csv}, {test_csv}")
+        train_df = pd.read_csv(train_csv, header=None)
+        test_df = pd.read_csv(test_csv, header=None)
         
-    if not X_all:
-        raise ValueError("Could not extract any valid beats from the provided directories.")
+        X_train = train_df.iloc[:, :200].values.astype(np.float32)
+        y_train = train_df.iloc[:, 200].values.astype(int)
         
-    X_all = np.array(X_all)
-    y_all = np.array(y_all, dtype=int)
-    
-    logger.info(f"Extracted {len(X_all)} total beats. Class distribution: {np.bincount(y_all, minlength=5)}")
-    
-    X_train, X_test, y_train, y_test = train_test_split(
-        X_all, y_all, test_size=0.2, random_state=42, stratify=y_all
-    )
+        X_test = test_df.iloc[:, :200].values.astype(np.float32)
+        y_test = test_df.iloc[:, 200].values.astype(int)
+        
+        if ptb_dir and os.path.exists(ptb_dir):
+            X_ptb, y_ptb = load_ptb(ptb_dir)
+            if len(X_ptb) > 0:
+                X_ptb = np.array(X_ptb)
+                y_ptb = np.array(y_ptb)
+                X_ptb_train, X_ptb_test, y_ptb_train, y_ptb_test = train_test_split(
+                    X_ptb, y_ptb, test_size=0.2, random_state=42, stratify=y_ptb
+                )
+                X_train = np.concatenate([X_train, X_ptb_train], axis=0)
+                y_train = np.concatenate([y_train, y_ptb_train], axis=0)
+                X_test = np.concatenate([X_test, X_ptb_test], axis=0)
+                y_test = np.concatenate([y_test, y_ptb_test], axis=0)
+    else:
+        # Fallback to raw WFDB loading
+        X_all, y_all = [], []
+        X_mit, y_mit = load_mitbih(mitbih_dir)
+        X_all.extend(X_mit)
+        y_all.extend(y_mit)
+        
+        if ptb_dir and os.path.exists(ptb_dir):
+            X_ptb, y_ptb = load_ptb(ptb_dir)
+            X_all.extend(X_ptb)
+            y_all.extend(y_ptb)
+            
+        if not X_all:
+            raise ValueError("Could not extract any valid beats from the provided directories.")
+            
+        X_all = np.array(X_all)
+        y_all = np.array(y_all, dtype=int)
+        
+        X_train, X_test, y_train, y_test = train_test_split(
+            X_all, y_all, test_size=0.2, random_state=42, stratify=y_all
+        )
+        
+    logger.info(f"Train samples: {len(X_train)} | Test samples: {len(X_test)}")
+    logger.info(f"Train class distribution: {np.bincount(y_train, minlength=5)}")
     
     train_dataset = ECGDataset(X_train, y_train)
     test_dataset = ECGDataset(X_test, y_test)

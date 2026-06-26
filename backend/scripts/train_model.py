@@ -159,9 +159,10 @@ def train_model(mitbih_dir: str, ptb_dir: str, epochs: int = 20, batch_size: int
         
         history.append({
             "epoch": epoch + 1,
-            "train_loss": train_loss / len(train_loader),
-            "val_loss": val_loss / len(test_loader),
-            "val_acc": val_acc
+            "train_acc": round(100. * correct / total, 4),
+            "train_loss": round(train_loss / len(train_loader), 6),
+            "val_acc": round(val_acc, 4),
+            "val_loss": round(val_loss / len(test_loader), 6),
         })
 
         logger.info(f"Epoch {epoch+1} Summary | Val Loss: {val_loss/val_total:.4f} | Val Acc: {val_acc:.2f}%")
@@ -191,13 +192,9 @@ def train_model(mitbih_dir: str, ptb_dir: str, epochs: int = 20, batch_size: int
     # 6. Automatic HEX Generation
     logger.info("⚡ Generating FPGA HEX files from the best model weights...")
     try:
-        model.load_state_dict(torch.load(save_path, map_location=device))
+        model.load_state_dict(torch.load(save_path, map_location=device, weights_only=True))
         model.eval()
         
-        # Save dummy quantization.json just to populate the generated directory
-        with open("generated/quantization.json", "w") as f:
-            json.dump({"status": "quantized", "bits": 8, "scale_factor": 0.00392}, f)
-            
         hex_dir = "generated"
         generate_local_hex_files(model, hex_dir)
         logger.info(f"✅ HEX files successfully generated in {hex_dir}/ directory.")

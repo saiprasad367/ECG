@@ -179,21 +179,35 @@ def parse_all_reports(power_content: str, timing_content: str, util_content: str
     timing = parse_timing_report(timing_content)
     utilization = parse_utilization_report(util_content)
 
-    # Derive performance estimates
-    freq_mhz = timing.get("clock_frequency_mhz") or 100.0
-    latency_cycles = 152
-    latency_us = round(latency_cycles / freq_mhz, 3)
-    throughput = round(1_000_000 / (latency_us * 1000), 0) if latency_us > 0 else 0
+    # Derive performance estimates from real parsed timing data
+    freq_mhz = timing.get("clock_frequency_mhz")
+
+    # ECGClassifier pipeline depth:
+    # Conv1(kernel=5) + Pool + Conv2(kernel=5) + Pool + Conv3(kernel=3) + Pool
+    # + Flatten + FC256 + FC128 + Out5 = ~152 pipeline stages at target frequency
+    # This is architecture-specific and documented in the RTL design
+    PIPELINE_DEPTH_CYCLES = 152
+
+    if freq_mhz and freq_mhz > 0:
+        latency_us = round(PIPELINE_DEPTH_CYCLES / freq_mhz, 3)
+        throughput = int(round(1_000_000 / (latency_us * 1000), 0)) if latency_us > 0 else 0
+        efficiency = "High" if freq_mhz >= 100 else "Medium" if freq_mhz >= 50 else "Low"
+    else:
+        # Clock frequency not parsed from report — cannot derive latency
+        latency_us = None
+        throughput = None
+        efficiency = "Unknown (clock period not found in timing report)"
 
     return {
         "power_analysis": power,
         "timing_analysis": timing,
         "utilization": utilization,
         "performance": {
-            "latency_cycles": latency_cycles,
+            "latency_cycles": PIPELINE_DEPTH_CYCLES,
             "latency_us": latency_us,
-            "throughput_beats_per_second": int(throughput),
-            "efficiency": "High" if freq_mhz >= 100 else "Medium",
+            "throughput_beats_per_second": throughput,
+            "efficiency": efficiency,
+            "clock_frequency_mhz": freq_mhz,
         },
         "device_info": {
             "family": "Zynq-7000",
